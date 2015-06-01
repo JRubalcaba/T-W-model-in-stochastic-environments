@@ -26,50 +26,54 @@ TyW <- function(k, af, qminf, bm, b, qmaxf, epsilon, sigma){
      qmaxm <- qmaxf * k
       r    <- seq(0.0001, 1, 0.0001)
         
-   #Values rm,f* are the intersection between qm,f* and the
-   #maximum rate of resoruce assimilarion given by parameter b
+   # Values rm,f* are the intersection between qm,f* and the
+   # maximum rate of resoruce assimilarion given by parameter b
 
       EESpdt <- b * r 
       roptm  <- mean(r[round(EESpdt,4) <= optm + 0.001 & round(EESpdt,4) >= optm - 0.001]) 
       roptf  <- mean(r[round(EESpdt,4) <= optf + 0.001 & round(EESpdt,4) >= optf - 0.001]) 
     
-   #Curves q(r) are estimated by an algorithmic approximation to the optimal
-   #points given by (rm*, qm*) for males and (rf*, qf*) for females.
+   # Curves q(r) are estimated by an algorithmic approximation to the optimal
+   # points given by (rm*, qm*) for males and (rf*, qf*) for females.
 
       rminf <- qminf
       testf <- "FALSE"
     
     while (testf != "TRUE") { 
+    
 	#The loop look for the values of rmin and beta for which q’(r) / r  = 0
+	
      	rminf <- rminf + 0.01 
       	betaf <- log((qminf - optf) / qmaxf + 1) / (rminf - roptf)
       
       	qf.line <-  qminf + qmaxf * (1 - exp(-betaf * (r - rminf)))   
-     diffqf <- (betaf * qmaxf * exp(-betaf * (r - rminf))) / r - (qminf - qmaxf * (exp(-betaf * (r - rminf)) - 1)) / r ^ 2
+        diffqf  <- (betaf * qmaxf * exp(-betaf * (r - rminf))) / r - (qminf - qmaxf * (exp(-betaf * (r - rminf)) - 1)) / r ^ 2
       
       	qfmax.rate <- mean(qf.line[diffqf <= 0.001 & diffqf >= -0.001], na.rm = T)
       	rfmax.rate <- mean(r[qf.line <= qfmax.rate + 0.001 & qf.line >= qfmax.rate - 0.001], na.rm = T)
       
-            testf <- (qfmax.rate <= mean(EESpdt[round(r, 3) == round(rfmax.rate, 3)]) + 0.001 & qfmax.rate >=  mean(EESpdt[round(r, 3) == round(rfmax.rate, 3)]) - 0.001) 
-           
-if (is.na(testf)){
-      		  testf <- "FALSE"
+        testf <- (qfmax.rate <= mean(EESpdt[round(r, 3) == round(rfmax.rate, 3)]) + 0.001 & qfmax.rate >=  mean(EESpdt[round(r, 3) == round(rfmax.rate, 3)]) - 0.001) 
+        
+         if (is.na(testf)){
+      		 testf <- "FALSE"
      	 }     
     }
     
-    rminm <- qminm
-    testm <- "FALSE"
+   rminm <- qminm
+   testm <- "FALSE"
     
    while (testm != "TRUE") { 
+   
       	#The same for males
-     	 rminm <- rminm + 0.01
-     	 betam <- log((qminm - optm) / qmaxm + 1) / (rminm - roptm)
+      	
+     	rminm <- rminm + 0.01
+     	betam <- log((qminm - optm) / qmaxm + 1) / (rminm - roptm)
       
-      	qm.line <-  qminm + qmaxm * (1 - exp(-betam * (r - rminm)))   
-      diffqm <- (betam * qmaxm * exp(-betam * (r - rminm))) / r - (qminm - qmaxm * (exp(-betam * (r - rminm)) - 1)) / r ^ 2
+      	qm.line <- qminm + qmaxm * (1 - exp(-betam * (r - rminm)))   
+        diffqm  <- (betam * qmaxm * exp(-betam * (r - rminm))) / r - (qminm - qmaxm * (exp(-betam * (r - rminm)) - 1)) / r ^ 2
       
       	qmmax.rate <- mean(qm.line[diffqm <= 0.001 & diffqm >= -0.001],  na.rm = T)
-rmmax.rate <- mean(r[qm.line <= qmmax.rate + 0.001 & qm.line >= qmmax.rate - 0.001], na.rm = T)
+        rmmax.rate <- mean(r[qm.line <= qmmax.rate + 0.001 & qm.line >= qmmax.rate - 0.001], na.rm = T)
       
       	testm <- (qmmax.rate <= mean(EESpdt[round(r, 3) == round(rmmax.rate, 3)]) + 0.001 & qmmax.rate >=  mean(EESpdt[round(r, 3) == round(rmmax.rate, 3)]) - 0.001) 
      
@@ -79,6 +83,7 @@ rmmax.rate <- mean(r[qm.line <= qmmax.rate + 0.001 & qm.line >= qmmax.rate - 0.0
     }
      
 #Results are the functions q(r) for males and females
+
     qm.line <- qminm + qmaxm * (1 - exp(-betam * (r - rminm)))
       	qm.line[r < rminm] <- NA
     qf.line <- qminf + qmaxf * (1 - exp(-betaf * (r - rminf)))
