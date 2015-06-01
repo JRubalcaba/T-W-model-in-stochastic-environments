@@ -8,9 +8,9 @@ TyW <- function(k, af, qminf, bm, b, qmaxf, epsilon, sigma){
     bf    <-   k * bm
     q     <-   seq(0.0001, 1, 0.0001)
     
-    Fm.line            <-   am * (1 - (1 / cosh(bm * (q - qminm))))
+    Fm.line            <- am * (1 - (1 / cosh(bm * (q - qminm))))
     Fm.line[q < qminm] <- 0
-    Ff.line            <-  af * (1 - (1 / cosh(bf * (q - qminf))))
+    Ff.line            <- af * (1 - (1 / cosh(bf * (q - qminf))))
     Ff.line[q < qminf] <- 0
       
 #Determination of the Evolutionary Stable Sex Ratio Equilibrium
