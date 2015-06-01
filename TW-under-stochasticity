@@ -15,24 +15,23 @@ TyW <- function(k, af, qminf, bm, b, qmaxf, epsilon, sigma){
       
 #Determination of the Evolutionary Stable Sex Ratio Equilibrium
     
-    pdtf   <- Ff.line / q       #Rates of Fitness functions
+    pdtf <- Ff.line / q       #Rates of Fitness functions
     pdtm <- Fm.line / q
   
-    optm <- na.omit(q[pdtm == max(pdtm, na.rm = T)])[1] #Maximum rates
-    optf    <- na.omit(q[pdtf == max(pdtf, na.rm = T)])[1]
+    optm <- na.omit(q[pdtm == max(pdtm, na.rm = T)])[1     #Maximum rates
+    optf <- na.omit(q[pdtf == max(pdtf, na.rm = T)])[1]
     
  #Parameters of body size functions, q = f(r)
    
      qmaxm <- qmaxf * k
-      r 	        <- seq(0.0001, 1, 0.0001)
+      r    <- seq(0.0001, 1, 0.0001)
         
    #Values rm,f* are the intersection between qm,f* and the
    #maximum rate of resoruce assimilarion given by parameter b
 
       EESpdt <- b * r 
-      roptm = mean(r[round(EESpdt,4) <= optm + 0.001 & round(EESpdt,4) >= 
-          optm - 0.001]) 
-      roptf = mean(r[round(EESpdt,4) <= optf + 0.001 & round(EESpdt,4) >=     optf - 0.001]) 
+      roptm  <- mean(r[round(EESpdt,4) <= optm + 0.001 & round(EESpdt,4) >= optm - 0.001]) 
+      roptf  <- mean(r[round(EESpdt,4) <= optf + 0.001 & round(EESpdt,4) >= optf - 0.001]) 
     
    #Curves q(r) are estimated by an algorithmic approximation to the optimal
    #points given by (rm*, qm*) for males and (rf*, qf*) for females.
