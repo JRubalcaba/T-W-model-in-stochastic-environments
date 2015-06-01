@@ -1,0 +1,216 @@
+TyW <- function(k, af, qminf, bm, b, qmaxf, epsilon, sigma){
+  
+##Linear models
+#Parameters of Fitness functions, F = f(q)
+    
+    am	  <-   k * af	
+    qminm <-   k * qminf
+    bf    <-   k * bm
+    q     <-   seq(0.0001, 1, 0.0001)
+    
+    Fm.line            <-   am * (1 - (1 / cosh(bm * (q - qminm))))
+    Fm.line[q < qminm] <- 0
+    Ff.line            <-  af * (1 - (1 / cosh(bf * (q - qminf))))
+    Ff.line[q < qminf] <- 0
+      
+#Determination of the Evolutionary Stable Sex Ratio Equilibrium
+    
+    pdtf   <- Ff.line / q       #Rates of Fitness functions
+    pdtm <- Fm.line / q
+  
+    optm <- na.omit(q[pdtm == max(pdtm, na.rm = T)])[1] #Maximum rates
+    optf    <- na.omit(q[pdtf == max(pdtf, na.rm = T)])[1]
+    
+ #Parameters of body size functions, q = f(r)
+   
+     qmaxm <- qmaxf * k
+      r 	        <- seq(0.0001, 1, 0.0001)
+        
+   #Values rm,f* are the intersection between qm,f* and the
+   #maximum rate of resoruce assimilarion given by parameter b
+
+      EESpdt <- b * r 
+      roptm = mean(r[round(EESpdt,4) <= optm + 0.001 & round(EESpdt,4) >= 
+          optm - 0.001]) 
+      roptf = mean(r[round(EESpdt,4) <= optf + 0.001 & round(EESpdt,4) >=     optf - 0.001]) 
+    
+   #Curves q(r) are estimated by an algorithmic approximation to the optimal
+   #points given by (rm*, qm*) for males and (rf*, qf*) for females.
+
+      rminf <- qminf
+      testf <- "FALSE"
+    
+    while (testf != "TRUE") { 
+	#The loop look for the values of rmin and beta for which q’(r) / r  = 0
+     	rminf <- rminf + 0.01 
+      	betaf <- log((qminf - optf) / qmaxf + 1) / (rminf - roptf)
+      
+      	qf.line <-  qminf + qmaxf * (1 - exp(-betaf * (r - rminf)))   
+     diffqf <- (betaf * qmaxf * exp(-betaf * (r - rminf))) / r - (qminf - qmaxf * (exp(-betaf * (r - rminf)) - 1)) / r ^ 2
+      
+      	qfmax.rate <- mean(qf.line[diffqf <= 0.001 & diffqf >= -0.001], na.rm = T)
+      	rfmax.rate <- mean(r[qf.line <= qfmax.rate + 0.001 & qf.line >= qfmax.rate - 0.001], na.rm = T)
+      
+            testf <- (qfmax.rate <= mean(EESpdt[round(r, 3) == round(rfmax.rate, 3)]) + 0.001 & qfmax.rate >=  mean(EESpdt[round(r, 3) == round(rfmax.rate, 3)]) - 0.001) 
+           
+if (is.na(testf)){
+      		  testf <- "FALSE"
+     	 }     
+    }
+    
+    rminm <- qminm
+    testm <- "FALSE"
+    
+   while (testm != "TRUE") { 
+      	#The same for males
+     	 rminm <- rminm + 0.01
+     	 betam <- log((qminm - optm) / qmaxm + 1) / (rminm - roptm)
+      
+      	qm.line <-  qminm + qmaxm * (1 - exp(-betam * (r - rminm)))   
+      diffqm <- (betam * qmaxm * exp(-betam * (r - rminm))) / r - (qminm - qmaxm * (exp(-betam * (r - rminm)) - 1)) / r ^ 2
+      
+      	qmmax.rate <- mean(qm.line[diffqm <= 0.001 & diffqm >= -0.001],  na.rm = T)
+rmmax.rate <- mean(r[qm.line <= qmmax.rate + 0.001 & qm.line >= qmmax.rate - 0.001], na.rm = T)
+      
+      	testm <- (qmmax.rate <= mean(EESpdt[round(r, 3) == round(rmmax.rate, 3)]) + 0.001 & qmmax.rate >=  mean(EESpdt[round(r, 3) == round(rmmax.rate, 3)]) - 0.001) 
+     
+ if (is.na(testf)){
+       		 testf <- "FALSE"
+    	  }       
+    }
+     
+#Results are the functions q(r) for males and females
+    qm.line <- qminm + qmaxm * (1 - exp(-betam * (r - rminm)))
+      	qm.line[r < rminm] <- NA
+    qf.line <- qminf + qmaxf * (1 - exp(-betaf * (r - rminf)))
+      	qf.line[r < rminf] <- NA    
+
+  
+  ##Stochastic models
+    #Variability of r [r ~ N(mean = roptm, std = sigma)]
+
+    ESm <- rnorm(length(r), roptm, sigma)
+    ESf <- rnorm(length(r), roptf, sigma)
+    ESm[ESm < 0] <- 0
+    ESf[ESf < 0] <- 0
+    
+    #Maternal uncertainty in offspring size [q ~ N(mean = q, std = epsilon)] 
+  
+    SDqm <- epsilon / (exp(2 * rminm / ESm) + 1 * exp(1  * ESm))
+    SDqf <- epsilon / (exp(2 * rminf / ESf) + 1 * exp(1  * ESf))
+    randqm <- rnorm(length(ESm), 0, SDqm) 
+    randqf <- rnorm(length(ESf), 0, SDqf) 
+  
+    qm <- qminm + qmaxm * (1 - exp(-betam * (ESm - rminm))) + randqm
+      	qm[ESm == 0] <- 0
+      	qm[qm < 0] <- 0
+    qf <- qminf + qmaxf * (1 - exp(-betaf * (ESf - rminf))) + randqf
+      	qf[ESf == 0] <- 0
+      	qf[qf < 0] <- 0
+    
+    #Estimating fitness from q(r, epsilon)
+  
+    Fm <- am * (1 - (1 / cosh(bm * (qm - qminm)))) 
+      	Fm[qm < qminm] <- 0
+    Ff <- af * (1 - (1 / cosh(bf * (qf - qminf)))) 
+      	Ff[qf < qminf] <- 0
+  
+  ##Stochastic Plots 
+    #Plot Fitness vs epsilon 
+  
+    ESm.plot <- round(ESm, 1) * 2 # extract discrete values from the distribution of r
+    ESf.plot <- round(ESf, 1) * 2
+    
+    SDqm.plot <- epsilon / (exp(2 * rminm / ESm.plot) + 1 * exp(1  * ESm.plot))
+    SDqf.plot <- epsilon / (exp(2 * rminf / ESf.plot) + 1 * exp(1  * ESf.plot))
+    randqm.plot <- rnorm(length(ESm.plot), 0, SDqm.plot) 
+    randqf.plot <- rnorm(length(ESf.plot), 0, SDqf.plot) 
+    
+    qm.plot <- qmaxm * (1 - exp(-betam * (ESm.plot - rminm))) + randqm.plot
+      	qm.plot[ESm.plot == 0] <- 0           
+    qf.plot <- qmaxf * (1 - exp(-betaf * (ESf.plot - rminf))) + randqf.plot
+      	qf.plot[ESf.plot == 0] <- 0
+      
+    Fm.plot <- am * (1 - (1 / cosh(bm * (qm.plot- qminm)))) 
+      	Fm.plot[qm.plot < qminm] <- 0
+    Ff.plot <- af * (1 - (1 / cosh(bf * (qf.plot - qminf))))
+      	Ff.plot[qf.plot < qminf] <- 0
+
+  #Remove values in the plot of r that produce average fitness = 0 
+    qualm <- sort(unique(ESm.plot)) 
+    for (i in 1:5){
+Fqualm <- Fm.plot[ESm.plot == qualm[i] & randqm.plot <= 0.01 &              randqm.plot >= -0.01]
+        	if(max(Fqualm, na.rm = T) == 0) {
+          			Fm.plot[ESm.plot == qualm[i]] <- NA  
+      	} 
+    }
+    qualf <- sort(unique(ESf.plot))
+    for (i in 1:5){
+      	Fqualf <- Ff.plot[ESf.plot == qualf[i] & randqf.plot <= 0.01 & randqf.plot >= -0.01]
+        	if(max(Fqualf, na.rm = T) == 0) {
+          			Ff.plot[ESf.plot == qualf[i]] <- NA  
+     	 } 
+    }
+  
+    qm[qm == 0] <- NA
+    qf[qf == 0] <- NA
+    
+    Fm.plot[Fm.plot == 0] <- NA
+    Ff.plot[Ff.plot == 0] <- NA
+  
+    plot(Fm.plot ~ randqm.plot, col = "blue", ylim = c(0,am), xlim = c(-1.5, 1.5), pch = 20,
+         ylab = "Fitness return (F)",
+         xlab = "Environmental uncertainty (epsilon)",
+         main = "Stochastic fitness return")
+    points(Ff.plot ~ randqf.plot, col = "red", pch = 20)
+    abline(v = 0)
+    
+    plot(qm ~ ESm, ylim = c(0, 2), xlim = c(0, qmaxm), type = "p", col = "blue", pch = 20,
+         ylab = "Body size (q)",
+         xlab = "Invested resources (r)",
+         main = "Stochastic body size functions")
+    points(qf ~ ESf, col = "red", pch = 20)
+    
+    plot(Fm ~ qm, col = "blue", xlim = c(0, am), pch = 20,
+         ylab = "Fitness return (F)",
+         xlab = "Body size (q)",
+         main = "Stochastic fitness functions")
+    points(Ff ~ qf, col = "red", pch = 20)
+  
+##Line Plots
+
+    plot(qm.line ~ r, ylim = c(0, qmaxm), xlim = c(0, qmaxm), type = "l", pch = 20, col = "blue",
+         ylab = "Body size (q)",
+         xlab = "Invested resources (r)",
+         main = "Offspring body size functions")
+    points(qf.line ~ r, pch = 20, type = "l", col = "red")
+    abline(a = 0, b = max(qm.line / r, na.rm = T))
+    abline(h = optm, lty=3)
+    abline(h = optf, lty=3)
+    abline(v = r[round(EESpdt,3) == round(optm,3)],  col = "blue")
+    abline(v = r[round(EESpdt,3) == round(optf,3)], col = "red")
+    abline(h = qminf, lty=3)
+    abline(h = qminm, lty=3)
+      
+    plot(Fm.line ~ q, col = "blue", type = "l", pch = 20, ylim = c(0, am), xlim = c(0,1.2),
+         ylab = "Fitness return (F)",
+         xlab = "Body size (q)",
+         main = "Fitness functions")
+    points(Ff.line ~ q, col = "red", type = "l", pch = 20)
+    abline(a = 0, b = max(pdtm, na.rm = T))
+    abline(v = optf, col = "red")    
+    abline(v = optm, col = "blue")   
+}
+
+##The following function generates four consecutive plots (please use R Studio). #Parameters represent:
+
+# k = degree of dimorphism
+# af = maximum fitness for females 
+# bm = magnitude of fitness gain per unit of body mass
+# b = maximum rate of resource assimilation
+# qminf = minimum body size necessary for females to survive
+# qmaxf = maximum body size of females
+# epsilon = stochasticity affecting body mass (standard deviation)
+#  sigma = stochasticity affecting maternal resoruce investment (std dev) 
+
+TyW(k = 1.7, af = 0.7, bm = 3.5, b = 1, qminf = 0.1, qmaxf = 0.7, epsilon = 0.5, sigma = 0.5)
