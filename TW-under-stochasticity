@@ -141,12 +141,13 @@ TyW <- function(k, af, qminf, bm, b, qmaxf, epsilon, sigma){
       	Ff.plot[qf.plot < qminf] <- 0
 
   #Remove values in the plot of r that produce average fitness = 0 
+  
     qualm <- sort(unique(ESm.plot)) 
     for (i in 1:5){
-Fqualm <- Fm.plot[ESm.plot == qualm[i] & randqm.plot <= 0.01 &              randqm.plot >= -0.01]
-        	if(max(Fqualm, na.rm = T) == 0) {
-          			Fm.plot[ESm.plot == qualm[i]] <- NA  
-      	} 
+    Fqualm <- Fm.plot[ESm.plot == qualm[i] & randqm.plot <= 0.01 & randqm.plot >= -0.01]
+       if(max(Fqualm, na.rm = T) == 0) {
+           Fm.plot[ESm.plot == qualm[i]] <- NA  
+        } 
     }
     qualf <- sort(unique(ESf.plot))
     for (i in 1:5){
