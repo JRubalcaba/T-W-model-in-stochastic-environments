@@ -18,7 +18,7 @@ TyW <- function(k, af, qminf, bm, b, qmaxf, epsilon, sigma){
     pdtf <- Ff.line / q       #Rates of Fitness functions
     pdtm <- Fm.line / q
   
-    optm <- na.omit(q[pdtm == max(pdtm, na.rm = T)])[1     #Maximum rates
+    optm <- na.omit(q[pdtm == max(pdtm, na.rm = T)])[1]    #Maximum rates
     optf <- na.omit(q[pdtf == max(pdtf, na.rm = T)])[1]
     
  #Parameters of body size functions, q = f(r)
