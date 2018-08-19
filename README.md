@@ -1,15 +1,5 @@
 ## T-W-model-in-stochastic-environments
 
-#### J. Rubalcaba, J.P. Veiga, V. Polo (in prep)
+#### Rubalcaba, J.G., Fawcett, T.W., Polo, V. 2016 (JG Rualcaba's PhD Thesis)
 
-
-Our aim is to analyse the consequences of stochasticity on offspring condition and fitness in a polygamous and 
-sexually dimorphic species in which males are bigger than females. We defined the model as a two-steps process 
-in which (a) parents determine body size of their sons and daughters during the period of parental care; and 
-(b) body size determine the fitness return of males and females. Stochasticity is defined here as the 
-spatial variability affecting individuals independently. This variability is included in the system in two forms. 
-First, individuals could individually optimize resource investment relying on environmental or physiological cues, 
-e.g., in relation to their body condition, age or breeding experience and territory quality (rm and rf). 
-Second, parents investing a given amount of resources could obtain a variability of results when unpredictable 
-environmental factors affect their breeding activities. This variability represents the uncertainty of parents 
-determining body condition and fitness of their offspring (ε). 
+When the condition of a mother has different effects on the condition and future fitness of her sons and daughters, she is expected to produce the sex that maximizes her benefits. However, few studies have addressed how the uncertainty about the condition and fitness of the offspring can affect the strength of selection for a facultative sex determination. We analyzed the effect of increasing the residual variance in offspring condition in relation to that of their mother at reproduction on the reproductive value of sons and daughters. Based upon previous arguments, we expected to find two possible responses: (1) a reduction in the difference between male and female reproductive values, i.e. weaker selection of sex ratio adjustments; or (2) greater reduction of the male reproductive value, i.e. weaker selection for male-biased sex ratios. We developed an Integral Projection Model parameterized with long-term data from a wild population of a polygynous bird, to study the effect of maternal condition at reproduction on the reproductive values of her sons and daughters. We showed that increasing offspring phenotypic variance might reduce the reproductive value of sons more strongly than the reproductive value of daughters. Consequently, factors that increase the variance in offspring condition might weaken selection acting on mothers in good condition to overproduce sons and strengthen selection on mothers in poor condition to overproduce daughters. Our results support the idea that mothers might benefit by producing the less variable sex in stochastic environments, i.e. when the stochasticity affects the variance in offspring condition at independence. This study demonstrates that not only the change in the mean offspring condition, but also its variance in relation to the condition of their mother, is important to understand the selective pressures acting on a mother to adjust the sex of her offspring.
